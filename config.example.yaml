@@ -45,6 +45,13 @@ injection:
   # Press Return after pasting in these apps (exact app names, e.g.
   # Claude, ChatGPT). Empty = never. Sends without a chance to review.
   auto_submit_apps: []
+  # Apps that show another machine (screen sharing, VNC, VMs): skip the
+  # Accessibility insert and paste via the clipboard with slower key timing.
+  # remote_paste_modifier is the key the viewer needs: cmd (minimalVNC,
+  # which syncs the clipboard to the remote on Cmd+V) or ctrl.
+  # Needs clipboard sync in the viewer.
+  remote_apps: [Schermdeling, Screen Sharing]
+  remote_paste_modifier: ctrl
 
 # Notices when you manually retype something Fluister just pasted (a
 # misheard name, a term it keeps getting wrong) and, after `threshold`

@@ -221,7 +221,11 @@ class Fluister(QObject):
     def _paste(self, text, app_name):
         injection = self.cfg["injection"]
         pasted = text + " " if injection["trailing_space"] else text
-        paste_text(pasted, self.cfg)
+        paste_text(
+            pasted,
+            self.cfg,
+            remote=_app_matches(app_name, injection.get("remote_apps")),
+        )
         corrections.watch_for_correction(self.cfg, pasted, self.tray)
         if _app_matches(app_name, injection["auto_submit_apps"]):
             press_return_later()

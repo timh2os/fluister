@@ -24,6 +24,7 @@ Good open-source dictation apps exist ([Handy](https://github.com/cjpais/Handy),
 - **Silence and hallucination guard**: a Silero voice-activity check means an accidental tap pastes nothing, and classic "Thank you." hallucinations are dropped.
 - **No clipped words**: an always-on mic keeps 300 ms of pre-roll and records 250 ms past release.
 - **Pastes without touching your clipboard** where possible (Accessibility API insertion), with a clipboard fallback.
+- **Remote desktop viewers**: list apps that show another machine (VNC viewers, screen sharing) under `injection.remote_apps` and Fluister pastes there with slower key timing and a chosen modifier (`remote_paste_modifier`: `cmd` or `ctrl`), instead of using the Accessibility API. Needs clipboard sync in the viewer.
 - **Small touches**: start/stop sounds, other audio muted while you dictate, a trailing space, optional auto-Enter per app.
 - **Menu bar app** with a small pill overlay at the bottom of the screen that never steals focus.
 - **Private**: history is a local JSON file you can switch off.

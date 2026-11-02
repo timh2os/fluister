@@ -22,8 +22,27 @@ _keyboard = Controller()
 IS_MAC = platform.system() == "Darwin"
 
 
-def paste_text(text: str, cfg: dict | None = None, restore_clipboard: bool = True):
+def paste_text(
+    text: str,
+    cfg: dict | None = None,
+    restore_clipboard: bool = True,
+    remote: bool = False,
+):
+    """remote=True is for apps that show another machine (screen sharing,
+    VNC, VMs): skip AX, paste with injection.remote_paste_modifier (ctrl
+    or cmd, depending on the viewer), hold the keys a little longer and
+    give the shared clipboard time to sync before pasting."""
     if not text:
+        return
+    if remote:
+        key = (cfg or {}).get("injection", {}).get("remote_paste_modifier", "ctrl")
+        _paste_via_clipboard(
+            text,
+            restore_clipboard=False,
+            modifier=Key.cmd if key == "cmd" else Key.ctrl,
+            hold=True,
+            sync_delay_s=0.5,
+        )
         return
 
     ax_insert_enabled = (cfg or {}).get("injection", {}).get("ax_insert", True)
@@ -53,7 +72,13 @@ def _verify_ax_insert(element, text: str):
         pass
 
 
-def _paste_via_clipboard(text: str, restore_clipboard: bool = True):
+def _paste_via_clipboard(
+    text: str,
+    restore_clipboard: bool = True,
+    modifier=None,
+    hold: bool = False,
+    sync_delay_s: float = 0.08,
+):
     previous = None
     if restore_clipboard:
         try:
@@ -62,12 +87,26 @@ def _paste_via_clipboard(text: str, restore_clipboard: bool = True):
             previous = None
 
     pyperclip.copy(text)
-    time.sleep(0.08)
+    time.sleep(sync_delay_s)
 
-    modifier = Key.cmd if IS_MAC else Key.ctrl
-    with _keyboard.pressed(modifier):
+    if modifier is None:
+        modifier = Key.cmd if IS_MAC else Key.ctrl
+    if hold:
+        # Remote viewers forward key events over the network and can drop
+        # or merge ones that arrive within a millisecond of each other
+        # (a lost key-up shows as a stuck, auto-repeating "v"), so hold
+        # each key briefly.
+        _keyboard.press(modifier)
+        time.sleep(0.06)
         _keyboard.press("v")
+        time.sleep(0.06)
         _keyboard.release("v")
+        time.sleep(0.06)
+        _keyboard.release(modifier)
+    else:
+        with _keyboard.pressed(modifier):
+            _keyboard.press("v")
+            _keyboard.release("v")
 
     if restore_clipboard and previous:
         def _restore():

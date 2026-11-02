@@ -40,6 +40,8 @@ DEFAULTS = {
         "ax_insert": True,
         "trailing_space": False,
         "auto_submit_apps": [],
+        "remote_apps": [],
+        "remote_paste_modifier": "ctrl",
     },
     "dictionary_learning": {
         "enabled": True,
